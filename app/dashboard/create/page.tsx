@@ -12,6 +12,7 @@ export default function CreateSlid() {
   const { address, isConnected } = useAccount()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [aiLoading, setAiLoading] = useState(false)
   const [step, setStep] = useState(1)
   const [form, setForm] = useState({
     client_name: '',
@@ -21,6 +22,46 @@ export default function CreateSlid() {
     scope: '',
     terms: '',
   })
+
+  const generateWithAI = async (type: 'scope' | 'terms' | 'full') => {
+    if (!form.description) {
+      alert('Please enter a description first')
+      return
+    }
+
+    setAiLoading(true)
+    try {
+      const response = await fetch('/api/ai/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: form.description,
+          type: type
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        if (type === 'full' && data.data) {
+          setForm(prev => ({
+            ...prev,
+            scope: data.data.scope || prev.scope,
+            terms: data.data.terms || prev.terms
+          }))
+        } else if (data.text) {
+          if (type === 'scope') {
+            setForm(prev => ({ ...prev, scope: data.text }))
+          } else if (type === 'terms') {
+            setForm(prev => ({ ...prev, terms: data.text }))
+          }
+        }
+      }
+    } catch (error) {
+      console.error('AI generation error:', error)
+    }
+    setAiLoading(false)
+  }
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault()
@@ -189,30 +230,67 @@ export default function CreateSlid() {
                 <div className="px-5 py-3 text-sm text-muted">{form.description}</div>
               </div>
 
+              {/* AI Generate Button */}
+              <button
+                type="button"
+                onClick={() => generateWithAI('full')}
+                disabled={aiLoading}
+                className="w-full py-3 px-4 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {aiLoading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Generate with AI
+                  </>
+                )}
+              </button>
+
               {/* Agreement Section */}
               <div className="space-y-4">
-                <h2 className="font-semibold text-foreground">Agreement (Optional)</h2>
-                <p className="text-sm text-muted">Client will agree to these terms before paying</p>
-                
-                <div>
-                  <label className="text-sm text-muted mb-2 block">Scope of Work</label>
-                  <textarea
-                    className="input min-h-[100px]"
-                    placeholder="Describe what you'll deliver..."
-                    value={form.scope}
-                    onChange={(e) => setForm({ ...form, scope: e.target.value })}
-                  />
+                <div className="flex items-center justify-between">
+                  <h2 className="font-semibold text-foreground">Scope of Work</h2>
+                  <button
+                    type="button"
+                    onClick={() => generateWithAI('scope')}
+                    disabled={aiLoading}
+                    className="text-xs text-primary hover:underline disabled:opacity-50"
+                  >
+                    {aiLoading ? 'Generating...' : 'AI Generate'}
+                  </button>
                 </div>
+                <textarea
+                  className="input min-h-[100px]"
+                  placeholder="Describe what you'll deliver..."
+                  value={form.scope}
+                  onChange={(e) => setForm({ ...form, scope: e.target.value })}
+                />
+              </div>
 
-                <div>
-                  <label className="text-sm text-muted mb-2 block">Terms & Conditions</label>
-                  <textarea
-                    className="input min-h-[100px]"
-                    placeholder="Payment terms, refund policy, timeline..."
-                    value={form.terms}
-                    onChange={(e) => setForm({ ...form, terms: e.target.value })}
-                  />
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-semibold text-foreground">Terms & Conditions</h2>
+                  <button
+                    type="button"
+                    onClick={() => generateWithAI('terms')}
+                    disabled={aiLoading}
+                    className="text-xs text-primary hover:underline disabled:opacity-50"
+                  >
+                    {aiLoading ? 'Generating...' : 'AI Generate'}
+                  </button>
                 </div>
+                <textarea
+                  className="input min-h-[100px]"
+                  placeholder="Payment terms, refund policy, timeline..."
+                  value={form.terms}
+                  onChange={(e) => setForm({ ...form, terms: e.target.value })}
+                />
               </div>
 
               <div className="flex gap-3">
