@@ -22,8 +22,8 @@ export default function CreateSlid() {
     terms: '',
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
     if (!address || !form.client_name || !form.amount || !form.description) return
 
     setLoading(true)
@@ -43,7 +43,7 @@ export default function CreateSlid() {
 
     if (error) {
       console.error('Error creating slid:', error)
-      alert('Failed to create slid')
+      alert('Failed to create invoice')
       setLoading(false)
       return
     }
@@ -61,11 +61,13 @@ export default function CreateSlid() {
       {/* Header */}
       <header className="bg-surface border-b border-border sticky top-0 z-50">
         <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/dashboard" className="w-10 h-10 bg-surface-light rounded-full flex items-center justify-center">
-            <span className="text-lg">←</span>
+          <Link href="/dashboard" className="w-10 h-10 bg-surface-light rounded-full flex items-center justify-center hover:bg-border transition-colors">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
           </Link>
           <div className="flex-1">
-            <h1 className="font-semibold">Create Slid</h1>
+            <h1 className="font-semibold">Create Invoice</h1>
             <p className="text-xs text-muted">Step {step} of 2</p>
           </div>
         </div>
@@ -151,15 +153,14 @@ export default function CreateSlid() {
                 disabled={!form.amount || !form.client_name || !form.description}
                 className="btn-primary w-full py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Continue →
+                Continue
               </button>
               
               <button
                 type="button"
                 onClick={() => {
-                  // Skip agreement, submit directly
                   if (form.amount && form.client_name && form.description) {
-                    handleSubmit(new Event('submit') as any)
+                    handleSubmit()
                   }
                 }}
                 disabled={!form.amount || !form.client_name || !form.description}
@@ -221,14 +222,14 @@ export default function CreateSlid() {
                   onClick={() => setStep(1)}
                   className="btn-secondary flex-1 py-4"
                 >
-                  ← Back
+                  Back
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
                   className="btn-primary flex-1 py-4 disabled:opacity-50"
                 >
-                  {loading ? 'Creating...' : 'Create Slid ✓'}
+                  {loading ? 'Creating...' : 'Create Invoice'}
                 </button>
               </div>
             </motion.div>

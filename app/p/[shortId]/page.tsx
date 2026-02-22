@@ -108,11 +108,9 @@ export default function PayPage() {
   const handleSwipeEnd = () => {
     const currentX = x.get()
     if (currentX > 180) {
-      // Trigger payment
       animate(x, 220, { duration: 0.2 })
       handlePay()
     } else {
-      // Reset
       animate(x, 0, { duration: 0.3 })
     }
   }
@@ -129,7 +127,11 @@ export default function PayPage() {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="text-center">
-          <div className="text-6xl mb-4">🔍</div>
+          <div className="w-16 h-16 bg-surface-light rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
           <h1 className="text-2xl font-bold mb-2">Invoice not found</h1>
           <p className="text-muted">This link may be expired or invalid</p>
         </div>
@@ -146,10 +148,12 @@ export default function PayPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="text-center max-w-md"
         >
-          <div className="w-24 h-24 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-5xl">✓</span>
+          <div className="w-24 h-24 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-12 h-12 text-background" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
           </div>
-          <h1 className="text-3xl font-bold mb-2">Payment Complete!</h1>
+          <h1 className="text-3xl font-bold mb-2">Payment Complete</h1>
           <p className="text-muted mb-6">
             ${Number(slid.amount).toLocaleString()} USDC sent to {slid.creator_address?.slice(0, 6)}...{slid.creator_address?.slice(-4)}
           </p>
@@ -158,9 +162,12 @@ export default function PayPage() {
               href={`https://basescan.org/tx/${slid.tx_hash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline text-sm"
+              className="text-primary hover:underline text-sm inline-flex items-center gap-1"
             >
-              View on BaseScan →
+              View on BaseScan
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
             </a>
           )}
         </motion.div>
@@ -284,7 +291,7 @@ export default function PayPage() {
               {/* Text */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <span className="text-muted font-medium">
-                  {paying || isPending || isConfirming ? 'Processing...' : 'Swipe to Pay →'}
+                  {paying || isPending || isConfirming ? 'Processing...' : 'Swipe to Pay'}
                 </span>
               </div>
 
@@ -293,7 +300,9 @@ export default function PayPage() {
                 className="absolute inset-0 flex items-center justify-center pointer-events-none"
                 style={{ opacity: checkOpacity }}
               >
-                <span className="text-background text-2xl font-bold">✓</span>
+                <svg className="w-8 h-8 text-background" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
               </motion.div>
 
               {/* Draggable button */}
@@ -306,7 +315,9 @@ export default function PayPage() {
                   style={{ x }}
                   className="absolute left-1 top-1 bottom-1 w-14 bg-primary rounded-xl flex items-center justify-center cursor-grab active:cursor-grabbing shadow-lg"
                 >
-                  <span className="text-background text-xl">→</span>
+                  <svg className="w-6 h-6 text-background" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
                 </motion.div>
               )}
               
@@ -330,7 +341,7 @@ export default function PayPage() {
 
         {/* Footer */}
         <div className="mt-12 text-center text-xs text-muted">
-          Powered by <span className="text-foreground">slid</span> • Payments on Base
+          Powered by <span className="text-foreground font-medium">slid</span> • Payments on Base
         </div>
       </div>
     </main>
