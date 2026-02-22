@@ -4,9 +4,31 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
+:root {
+  --background: #F8F9FA;
+  --surface: #FFFFFF;
+  --surface-light: #F1F3F5;
+  --border: #E9ECEF;
+  --primary-light: #E6FBF3;
+  --foreground: #212529;
+  --muted: #6C757D;
+  --dim: #ADB5BD;
+}
+
+.dark {
+  --background: #0A0A0B;
+  --surface: #141416;
+  --surface-light: #1C1C1F;
+  --border: #2A2A2D;
+  --primary-light: rgba(0, 212, 126, 0.15);
+  --foreground: #FAFAFA;
+  --muted: #71717A;
+  --dim: #52525B;
+}
+
 @layer base {
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased transition-colors duration-200;
   }
 }
 
@@ -20,7 +42,7 @@
   }
   
   .card {
-    @apply bg-surface border border-border rounded-2xl p-5 shadow-sm;
+    @apply bg-surface border border-border rounded-2xl p-5 shadow-sm transition-colors duration-200;
   }
   
   .input {
@@ -28,11 +50,11 @@
   }
 
   .stat-card {
-    @apply bg-surface rounded-2xl p-4 text-center shadow-sm border border-border;
+    @apply bg-surface rounded-2xl p-4 text-center shadow-sm border border-border transition-colors duration-200;
   }
 
   .action-icon {
-    @apply w-12 h-12 rounded-2xl flex items-center justify-center;
+    @apply w-12 h-12 rounded-2xl flex items-center justify-center transition-colors duration-200;
   }
 
   .tab-active {

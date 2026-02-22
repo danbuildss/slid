@@ -6,6 +6,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { supabase, Slid } from '@/lib/supabase'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default function Dashboard() {
   const { address, isConnected } = useAccount()
@@ -101,7 +102,10 @@ export default function Dashboard() {
               <div className="text-xs text-muted">Base Network</div>
             </div>
           </div>
-          <ConnectButton showBalance={false} accountStatus="avatar" chainStatus="none" />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <ConnectButton showBalance={false} accountStatus="avatar" chainStatus="none" />
+          </div>
         </div>
       </header>
 
