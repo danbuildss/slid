@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { parseUnits } from 'viem'
@@ -25,6 +25,7 @@ const USDC_ABI = [
 
 export default function PayPage() {
   const params = useParams()
+  const router = useRouter()
   const shortId = params.shortId as string
   const { address, isConnected } = useAccount()
   
