@@ -12,6 +12,7 @@ export interface Slid {
   creator_address: string
   client_name: string
   client_email?: string
+  client_address?: string
   amount: number
   currency: 'USDC'
   description: string
