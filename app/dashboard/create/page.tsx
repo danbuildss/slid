@@ -62,12 +62,12 @@ export default function CreateSlid() {
       <header className="bg-surface border-b border-border sticky top-0 z-50">
         <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-4">
           <Link href="/dashboard" className="w-10 h-10 bg-surface-light rounded-full flex items-center justify-center hover:bg-border transition-colors">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
           <div className="flex-1">
-            <h1 className="font-semibold">Create Invoice</h1>
+            <h1 className="font-semibold text-foreground">Create Invoice</h1>
             <p className="text-xs text-muted">Step {step} of 2</p>
           </div>
         </div>
@@ -91,7 +91,7 @@ export default function CreateSlid() {
               className="space-y-6"
             >
               {/* Amount Input - Big & Prominent */}
-              <div className="text-center py-8">
+              <div className="card text-center py-8">
                 <label className="text-sm text-muted mb-4 block">Enter Amount</label>
                 <div className="flex items-center justify-center gap-2">
                   <span className="text-4xl font-bold text-muted">$</span>
@@ -102,7 +102,7 @@ export default function CreateSlid() {
                     placeholder="0.00"
                     value={form.amount}
                     onChange={(e) => setForm({ ...form, amount: e.target.value })}
-                    className="text-5xl font-bold font-mono bg-transparent border-none outline-none text-center w-48 placeholder-border"
+                    className="text-5xl font-bold font-mono bg-transparent border-none outline-none text-center w-48 text-foreground placeholder-dim"
                     required
                   />
                 </div>
@@ -166,7 +166,7 @@ export default function CreateSlid() {
                 disabled={!form.amount || !form.client_name || !form.description}
                 className="w-full text-center text-sm text-muted hover:text-foreground transition-colors disabled:opacity-50"
               >
-                Skip agreement & create
+                Skip agreement
               </button>
             </motion.div>
           )}
@@ -179,21 +179,20 @@ export default function CreateSlid() {
               className="space-y-6"
             >
               {/* Summary Card */}
-              <div className="card bg-primary/5 border-primary/20">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-muted">Invoice for</span>
-                  <span className="font-semibold">{form.client_name}</span>
+              <div className="bg-surface rounded-2xl overflow-hidden shadow-sm border border-border">
+                <div className="bg-primary px-5 py-4">
+                  <div className="text-sm text-white/80">Invoice for {form.client_name}</div>
+                  <div className="text-3xl font-bold font-mono text-white">
+                    ${parseFloat(form.amount || '0').toLocaleString()}
+                  </div>
                 </div>
-                <div className="text-3xl font-bold font-mono text-primary">
-                  ${parseFloat(form.amount || '0').toLocaleString()}
-                </div>
-                <div className="text-sm text-muted mt-1">{form.description}</div>
+                <div className="px-5 py-3 text-sm text-muted">{form.description}</div>
               </div>
 
               {/* Agreement Section */}
               <div className="space-y-4">
-                <h2 className="font-semibold">Agreement (Optional)</h2>
-                <p className="text-sm text-muted">Client will need to agree to these terms before paying</p>
+                <h2 className="font-semibold text-foreground">Agreement (Optional)</h2>
+                <p className="text-sm text-muted">Client will agree to these terms before paying</p>
                 
                 <div>
                   <label className="text-sm text-muted mb-2 block">Scope of Work</label>
