@@ -9,16 +9,22 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: '#0A0A0B',
-        surface: '#141416',
-        'surface-light': '#1C1C1F',
-        border: '#2A2A2D',
+        // Light theme colors (like InvoiceJet)
+        background: '#F8F9FA',
+        surface: '#FFFFFF',
+        'surface-light': '#F1F3F5',
+        border: '#E9ECEF',
         primary: '#00D47E',
         'primary-hover': '#00B86B',
+        'primary-light': '#E6FBF3',
         secondary: '#3B82F6',
-        foreground: '#FAFAFA',
-        muted: '#71717A',
-        dim: '#52525B',
+        foreground: '#212529',
+        muted: '#6C757D',
+        dim: '#ADB5BD',
+        // Status colors
+        success: '#00D47E',
+        warning: '#FFC107',
+        danger: '#DC3545',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [slids, setSlids] = useState<Slid[]>([])
   const [stats, setStats] = useState({ total: 0, pending: 0, paid: 0, revenue: 0 })
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<'all' | 'paid' | 'pending'>('all')
 
   useEffect(() => {
     if (address) {
@@ -49,6 +50,19 @@ export default function Dashboard() {
   const truncateAddress = (addr: string) => 
     `${addr.slice(0, 6)}...${addr.slice(-4)}`
 
+  const filteredSlids = slids.filter(slid => {
+    if (activeTab === 'all') return true
+    return slid.status === activeTab
+  })
+
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString('en-US', { 
+      day: '2-digit', 
+      month: 'short', 
+      year: 'numeric' 
+    })
+  }
+
   // Not connected state
   if (!isConnected) {
     return (
@@ -58,8 +72,8 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center max-w-md"
         >
-          <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-10 h-10 text-background" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-20 h-20 bg-primary-light rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
@@ -79,116 +93,121 @@ export default function Dashboard() {
       <header className="bg-surface border-b border-border sticky top-0 z-50">
         <div className="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center">
               <span className="text-primary font-bold text-sm">{address?.slice(2, 4).toUpperCase()}</span>
             </div>
             <div>
-              <div className="text-sm text-muted">Welcome back</div>
               <div className="font-semibold">{truncateAddress(address!)}</div>
+              <div className="text-xs text-muted">Base Network</div>
             </div>
           </div>
-          <ConnectButton showBalance={false} accountStatus="avatar" chainStatus="icon" />
+          <ConnectButton showBalance={false} accountStatus="avatar" chainStatus="none" />
         </div>
       </header>
 
       <div className="max-w-lg mx-auto px-4 py-6">
-        {/* Total Revenue Card */}
+        {/* Stats Row - Like InvoiceJet */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-primary rounded-3xl p-6 mb-6 text-background"
+          className="grid grid-cols-3 gap-3 mb-6"
         >
-          <div className="text-sm opacity-80 mb-1">Total Revenue</div>
-          <div className="text-4xl font-bold font-mono mb-4">
-            ${stats.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          <div className="stat-card">
+            <div className="text-2xl font-bold text-foreground">{stats.total}</div>
+            <div className="text-xs text-muted mt-1">Total Invoices</div>
           </div>
-          <div className="flex items-center gap-2 text-sm opacity-80">
-            <span className="w-2 h-2 bg-background rounded-full"></span>
-            <span>USDC on Base</span>
+          <div className="stat-card">
+            <div className="text-2xl font-bold text-primary">{stats.paid}</div>
+            <div className="text-xs text-muted mt-1">Paid</div>
+          </div>
+          <div className="stat-card">
+            <div className="text-2xl font-bold text-warning">{stats.pending}</div>
+            <div className="text-xs text-muted mt-1">Pending</div>
           </div>
         </motion.div>
 
-        {/* Stats Row */}
+        {/* Quick Actions Grid - Like InvoiceJet */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-3 gap-3 mb-6"
+          className="grid grid-cols-4 gap-4 mb-8"
         >
-          <div className="card text-center py-4">
-            <div className="text-2xl font-bold font-mono">{stats.total}</div>
-            <div className="text-xs text-muted">Total Slids</div>
-          </div>
-          <div className="card text-center py-4">
-            <div className="text-2xl font-bold font-mono text-primary">{stats.paid}</div>
-            <div className="text-xs text-muted">Paid</div>
-          </div>
-          <div className="card text-center py-4">
-            <div className="text-2xl font-bold font-mono text-yellow-500">{stats.pending}</div>
-            <div className="text-xs text-muted">Pending</div>
-          </div>
-        </motion.div>
-
-        {/* Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="grid grid-cols-4 gap-3 mb-8"
-        >
-          <Link href="/dashboard/create" className="card text-center py-4 hover:border-primary/50 transition-colors">
-            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-2">
+          <Link href="/dashboard/create" className="text-center group">
+            <div className="action-icon bg-primary-light mx-auto mb-2 group-hover:scale-105 transition-transform">
               <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <div className="text-xs text-muted">Create</div>
+            <div className="text-xs text-foreground font-medium">Create Invoice</div>
           </Link>
-          <div className="card text-center py-4 opacity-40 cursor-not-allowed">
-            <div className="w-12 h-12 bg-surface-light rounded-2xl flex items-center justify-center mx-auto mb-2">
-              <svg className="w-6 h-6 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="text-center opacity-40 cursor-not-allowed">
+            <div className="action-icon bg-blue-50 mx-auto mb-2">
+              <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div className="text-xs text-muted">Customers</div>
+          </div>
+          <div className="text-center opacity-40 cursor-not-allowed">
+            <div className="action-icon bg-orange-50 mx-auto mb-2">
+              <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div className="text-xs text-muted">Expenses</div>
+          </div>
+          <div className="text-center opacity-40 cursor-not-allowed">
+            <div className="action-icon bg-purple-50 mx-auto mb-2">
+              <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <div className="text-xs text-muted">Analytics</div>
-          </div>
-          <div className="card text-center py-4 opacity-40 cursor-not-allowed">
-            <div className="w-12 h-12 bg-surface-light rounded-2xl flex items-center justify-center mx-auto mb-2">
-              <svg className="w-6 h-6 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
-            <div className="text-xs text-muted">Clients</div>
-          </div>
-          <div className="card text-center py-4 opacity-40 cursor-not-allowed">
-            <div className="w-12 h-12 bg-surface-light rounded-2xl flex items-center justify-center mx-auto mb-2">
-              <svg className="w-6 h-6 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            <div className="text-xs text-muted">Settings</div>
+            <div className="text-xs text-muted">Reports</div>
           </div>
         </motion.div>
 
-        {/* Recent Slids */}
+        {/* Recent Transactions Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold">Recent Slids</h2>
-            {slids.length > 0 && (
-              <span className="text-sm text-muted">See all</span>
-            )}
+          <h2 className="font-semibold text-lg mb-4">Recent Transactions</h2>
+
+          {/* Tabs - Like InvoiceJet */}
+          <div className="flex gap-2 mb-4">
+            <button 
+              onClick={() => setActiveTab('all')}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                activeTab === 'all' ? 'tab-active' : 'tab-inactive'
+              }`}
+            >
+              All Invoices
+            </button>
+            <button 
+              onClick={() => setActiveTab('paid')}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                activeTab === 'paid' ? 'tab-active' : 'tab-inactive'
+              }`}
+            >
+              Paid
+            </button>
+            <button 
+              onClick={() => setActiveTab('pending')}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                activeTab === 'pending' ? 'tab-active' : 'tab-inactive'
+              }`}
+            >
+              Pending
+            </button>
           </div>
 
           {loading ? (
             <div className="card text-center py-12">
               <div className="animate-pulse text-muted">Loading...</div>
             </div>
-          ) : slids.length === 0 ? (
+          ) : filteredSlids.length === 0 ? (
             <div className="card text-center py-12">
               <div className="w-16 h-16 bg-surface-light rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,44 +222,44 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="space-y-3">
-              {slids.map((slid, i) => (
+              {filteredSlids.map((slid, i) => (
                 <motion.div
                   key={slid.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.25 + i * 0.05 }}
                 >
                   <Link 
                     href={`/dashboard/share/${slid.short_id}`}
-                    className="card flex items-center gap-4 hover:border-primary/30 transition-colors"
+                    className="card flex items-center gap-4 hover:border-primary/30 hover:shadow-md transition-all"
                   >
                     {/* Avatar */}
-                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-lg font-semibold text-primary">
+                    <div className="w-11 h-11 bg-primary-light rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-base font-semibold text-primary">
                         {slid.client_name.charAt(0).toUpperCase()}
                       </span>
                     </div>
                     
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold truncate">{slid.client_name}</div>
-                      <div className="text-sm text-muted truncate">{slid.description}</div>
+                      <div className="font-semibold text-foreground">{slid.client_name}</div>
+                      <div className="text-xs text-muted">
+                        #{slid.short_id} • {formatDate(slid.created_at)}
+                      </div>
                     </div>
                     
                     {/* Amount & Status */}
                     <div className="text-right flex-shrink-0">
-                      <div className="font-bold font-mono">
+                      <div className="font-bold font-mono text-foreground">
                         ${Number(slid.amount).toLocaleString()}
                       </div>
-                      <div className={`text-xs px-2 py-0.5 rounded-full inline-block ${
+                      <span className={`text-xs px-2 py-0.5 rounded-full inline-block font-medium ${
                         slid.status === 'paid' 
-                          ? 'bg-primary/20 text-primary' 
-                          : slid.status === 'pending'
-                          ? 'bg-yellow-500/20 text-yellow-500'
-                          : 'bg-muted/20 text-muted'
+                          ? 'bg-primary-light text-primary' 
+                          : 'bg-yellow-100 text-yellow-700'
                       }`}>
-                        {slid.status.charAt(0).toUpperCase() + slid.status.slice(1)}
-                      </div>
+                        {slid.status === 'paid' ? 'Paid' : 'Pending'}
+                      </span>
                     </div>
                   </Link>
                 </motion.div>
@@ -250,20 +269,20 @@ export default function Dashboard() {
         </motion.div>
       </div>
 
-      {/* Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-surface border-t border-border">
-        <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-around">
+      {/* Bottom Nav - Like InvoiceJet */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-surface border-t border-border shadow-lg">
+        <div className="max-w-lg mx-auto px-6 py-3 flex items-center justify-around">
           <button className="flex flex-col items-center gap-1 text-primary">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
             </svg>
-            <span className="text-xs">Home</span>
+            <span className="text-xs font-medium">Home</span>
           </button>
           <Link href="/dashboard/create" className="flex flex-col items-center gap-1 text-muted hover:text-foreground transition-colors">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <span className="text-xs">Create</span>
+            <span className="text-xs">Invoices</span>
           </Link>
           <button className="flex flex-col items-center gap-1 text-muted opacity-40 cursor-not-allowed">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -273,10 +292,9 @@ export default function Dashboard() {
           </button>
           <button className="flex flex-col items-center gap-1 text-muted opacity-40 cursor-not-allowed">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
-            <span className="text-xs">Settings</span>
+            <span className="text-xs">Menu</span>
           </button>
         </div>
       </nav>
